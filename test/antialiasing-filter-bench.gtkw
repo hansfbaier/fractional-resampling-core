@@ -1,25 +1,24 @@
 [*]
 [*] GTKWave Analyzer v3.3.109 (w)1999-2020 BSI
-[*] Fri Jun 25 04:26:14 2021
+[*] Fri Jun 25 08:03:02 2021
 [*]
 [dumpfile] "antialiasingfilter.vcd"
-[dumpfile_mtime] "Fri Jun 25 04:25:00 2021"
-[dumpfile_size] 5845
+[dumpfile_mtime] "Fri Jun 25 08:02:34 2021"
+[dumpfile_size] 2058
 [savefile] "test/antialiasing-filter-bench.gtkw"
 [timestart] 0
 [size] 3828 2090
 [pos] -1 -1
-*-14.000000 35260 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-14.000000 95000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [sst_width] 357
 [signals_width] 255
 [sst_expanded] 1
-[sst_vpaned_height] 658
+[sst_vpaned_height] 650
 @28
 top.rst
 top.clk
-@22
-top.audio_in[15:0]
 @420
+top.audio_in[15:0]
 top.x0[55:0]
 top.x1[55:0]
 top.x2[55:0]
@@ -27,14 +26,14 @@ top.x3[55:0]
 top.x4[55:0]
 top.x5[55:0]
 top.x6[55:0]
-top.result[15:0]
-top.y0[55:0]
+@421
+top.audio_out[15:0]
+@420
 top.y1[55:0]
 top.y2[55:0]
 top.y3[55:0]
 top.y4[55:0]
 top.y5[55:0]
-@421
-top.audio_out[15:0]
+top.y6[55:0]
 [pattern_trace] 1
 [pattern_trace] 0

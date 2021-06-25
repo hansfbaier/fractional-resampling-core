@@ -60,9 +60,9 @@ class AntialiasingFilter(Elaboratable):
         b = [Const((1 << 40)) for _ in range(n)]
         a = [Const(1 << 40) for _ in range(n - 1)]
         x = Array(Signal(signed(self.bitwidth + self.fraction_bits), name=f"x{i}") for i in range(n))
-        y = Array(Signal(signed(self.bitwidth + self.fraction_bits), name=f"y{i}") for i in range(n - 1))
+        y = Array(Signal(signed(self.bitwidth + self.fraction_bits), name=f"y{i+1}") for i in range(n - 1))
 
-        m.d.sync += self.audio_out.eq(
+        m.d.comb += self.audio_out.eq(
               sum([((x[i] * b[i]) >> self.fraction_bits) for i in range(n)])
             + sum([((y[i] * a[i]) >> self.fraction_bits) for i in range(n - 1)]))
 
