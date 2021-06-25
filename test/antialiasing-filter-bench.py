@@ -17,10 +17,18 @@ if __name__ == "__main__":
     def sync_process():
         yield Tick()
         yield Tick()
+        yield dut.audio_in.eq(1)
+        yield Tick()
+        yield dut.audio_in.eq(0)
         yield Tick()
         yield Tick()
+        yield Tick()
+        yield Tick()
+        yield Tick()
+        yield Tick()
+        for _ in range(10): yield Tick()
 
     sim.add_sync_process(sync_process)
-    sim.add_clock(1e-6)
+    sim.add_clock(10e-9)
     with sim.write_vcd('antialiasingfilter.vcd', traces=[dut.audio_in, dut.audio_out]):
         sim.run()

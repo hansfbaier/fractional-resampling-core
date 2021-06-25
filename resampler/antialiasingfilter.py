@@ -8,7 +8,7 @@ from nmigen import *
 from pprint import pformat
 
 class AntialiasingFilter(Elaboratable):
-    def __init__(self, samplerate, bitwidth=16) -> None:
+    def __init__(self, samplerate, bitwidth=16, cutoff_freq=20000) -> None:
         self.audio_in  = Signal(signed(bitwidth))
         self.audio_out = Signal(signed(bitwidth))
         self.bitwidth = bitwidth
@@ -16,7 +16,7 @@ class AntialiasingFilter(Elaboratable):
         filter_order = 6
         num_coefficients = filter_order + 1
         nyquist_frequency = samplerate * 0.5
-        cutoff = 20000 / nyquist_frequency
+        cutoff = cutoff_freq / nyquist_frequency
         allowed_ripple = 1.0 # dB
         b, a = signal.cheby1(filter_order, allowed_ripple, cutoff, btype='lowpass', output='ba')
 
@@ -52,13 +52,24 @@ class AntialiasingFilter(Elaboratable):
 
         # see https://en.wikipedia.org/wiki/Infinite_impulse_response
         # and https://en.wikipedia.org/wiki/Digital_filter
+        # except that the negative signs in the recursive section seem
+        # to be already baked into the coefficients
+        # b are the input coefficients
+        # a are the recursive (output) coefficients
         n = len(self.a)
-        x = Array(Signal(signed(self.bitwidth + self.fraction_bits)) for _ in range(n))
-        y = Array(Signal(signed(self.bitwidth + self.fraction_bits)) for _ in range(n))
+        b = [Const((1 << 40)) for _ in range(n)]
+        a = [Const(1 << 40) for _ in range(n - 1)]
+        x = Array(Signal(signed(self.bitwidth + self.fraction_bits), name=f"x{i}") for i in range(n))
+        y = Array(Signal(signed(self.bitwidth + self.fraction_bits), name=f"y{i}") for i in range(n - 1))
 
-        m.d.sync += [
-            y[0]
-        ]
+        m.d.sync += self.audio_out.eq(
+              sum([((x[i] * b[i]) >> self.fraction_bits) for i in range(n)])
+            + sum([((y[i] * a[i]) >> self.fraction_bits) for i in range(n - 1)]))
+
+        m.d.sync += [x[i + 1].eq(x[i]) for i in range(n - 1)]
+        m.d.sync += [y[i + 1].eq(y[i]) for i in range(n - 2)]
+        m.d.sync += x[0].eq(self.audio_in)
+        m.d.sync += y[0].eq(self.audio_out)
 
         return m
 
