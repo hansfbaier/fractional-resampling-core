@@ -55,8 +55,6 @@ class FixedPointIIRFilter(Elaboratable):
 
         # see https://en.wikipedia.org/wiki/Infinite_impulse_response
         # and https://en.wikipedia.org/wiki/Digital_filter
-        # except that the negative signs in the recursive section seem
-        # to be already baked into the coefficients
         # b are the input coefficients
         # a are the recursive (output) coefficients
         n = len(self.a)
