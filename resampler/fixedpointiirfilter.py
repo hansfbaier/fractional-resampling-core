@@ -10,6 +10,7 @@ from pprint import pformat
 class FixedPointIIRFilter(Elaboratable):
     def __init__(self, samplerate, bitwidth=18, fraction_width=18,
                  cutoff_freq=20000, filter_order=2, filter_type='lowpass') -> None:
+        self.enable_in  = Signal()
         self.signal_in  = Signal(signed(bitwidth))
         self.signal_out = Signal(signed(bitwidth))
 
@@ -78,11 +79,12 @@ class FixedPointIIRFilter(Elaboratable):
               sum([((x[i] * b[i]) >> self.fraction_width) for i in range(n)])
             - sum([((y[i] * a[i]) >> self.fraction_width) for i in range(n - 1)]))
 
-        m.d.sync += [x[i + 1].eq(x[i]) for i in range(n - 1)]
-        m.d.sync += [y[i + 1].eq(y[i]) for i in range(n - 2)]
+        with m.If(self.enable_in):
+            m.d.sync += [x[i + 1].eq(x[i]) for i in range(n - 1)]
+            m.d.sync += [y[i + 1].eq(y[i]) for i in range(n - 2)]
 
-        m.d.sync += x[0].eq(self.signal_in)
-        m.d.sync += y[0].eq(self.signal_out)
+            m.d.sync += x[0].eq(self.signal_in)
+            m.d.sync += y[0].eq(self.signal_out)
 
         return m
 
