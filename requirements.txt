@@ -1,0 +1,4 @@
+scipy
+pprint
+git+https://github.com/nmigen/nmigen.git
+git+https://github.com/hansfbaier/nmigen-library.git
