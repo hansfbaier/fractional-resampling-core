@@ -8,8 +8,8 @@ from nmigen import *
 from pprint import pformat
 
 class FixedPointIIRFilter(Elaboratable):
-    def __init__(self, samplerate, bitwidth=18, fraction_width=18,
-                 cutoff_freq=20000, filter_order=2, filter_type='lowpass') -> None:
+    def __init__(self, samplerate: int, bitwidth: int=18, fraction_width: int=18,
+                 cutoff_freq: int=20000, filter_order: int=2, filter_type: str='lowpass') -> None:
         self.enable_in  = Signal()
         self.signal_in  = Signal(signed(bitwidth))
         self.signal_out = Signal(signed(bitwidth))
@@ -50,7 +50,7 @@ class FixedPointIIRFilter(Elaboratable):
             assert (conversion_errors_b[i] < 1.0)
             assert (conversion_errors_a[i] < 1.0)
 
-    def elaborate(self, platform):
+    def elaborate(self, platform) -> Module:
         m = Module()
 
         # see https://en.wikipedia.org/wiki/Infinite_impulse_response
