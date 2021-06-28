@@ -3,14 +3,15 @@
 # Copyright (c) 2021 Hans Baier <hansfbaier@gmail.com>
 # SPDX-License-Identifier: CERN-OHL-W-2.0
 
-from resampler.fixedpointiirfilter import FixedPointIIRFilter
 from nmigen import *
 from nmigen.lib.fifo import SyncFIFO
 from nmigen_library.stream import StreamInterface
+from .filterbank import Filterbank
 
 class FractionalResampler(Elaboratable):
     def __init__(self, *, input_samplerate: int,
                  upsample_factor: int, downsample_factor: int,
+                 filter_instances = 3,
                  filter_cutoff: int = 20000,
                  bitwidth: int = 16) -> None:
         self.signal_in  = StreamInterface(payload_width=bitwidth)
@@ -19,6 +20,7 @@ class FractionalResampler(Elaboratable):
         self.input_samplerate = input_samplerate
         self.upsample_factor = upsample_factor
         self.downsample_factor = downsample_factor
+        self.filter_instances = filter_instances
         self.filter_cutoff = filter_cutoff
         self.bitwidth = bitwidth
 
@@ -26,10 +28,11 @@ class FractionalResampler(Elaboratable):
         m = Module()
 
         m.submodules.antialiasingfilter = antialiasingfilter = \
-            FixedPointIIRFilter(self.input_samplerate * self.upsample_factor,
-                                bitwidth=self.bitwidth,
-                                cutoff_freq=self.filter_cutoff,
-                                filter_order=3)
+            Filterbank(self.filter_instances,
+                       self.input_samplerate * self.upsample_factor,
+                       bitwidth=self.bitwidth,
+                       cutoff_freq=self.filter_cutoff,
+                       filter_order=2)
 
         m.submodules.downsamplefifo = downsamplefifo = \
             SyncFIFO(width=self.bitwidth, depth=self.upsample_factor)
@@ -52,7 +55,7 @@ class FractionalResampler(Elaboratable):
         ]
 
         with m.If(input_valid & input_ready):
-            m.d.comb += [ 
+            m.d.comb += [
                 upsampled_signal.eq(self.signal_in.payload),
                 antialiasingfilter.enable_in.eq(1),
             ]

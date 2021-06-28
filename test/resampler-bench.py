@@ -16,9 +16,9 @@ if __name__ == "__main__":
     def sync_process():
         for _ in range(10): yield Tick()
         yield dut.signal_out.ready.eq(1)
-        for i in range(1000):
+        for i in range(600):
             yield Tick()
-            if i < 400:
+            if i < 250:
                 if i % 6 == 0:
                     yield dut.signal_in.valid.eq(1)
                     yield dut.signal_in.payload.eq(2**14)
