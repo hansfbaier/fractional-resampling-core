@@ -39,7 +39,7 @@ class FractionalResampler(Elaboratable):
 
         # upsampling
         upsampled_signal  = Signal.like(self.signal_in.payload)
-        upsample_counter  = Signal(self.upsample_factor)
+        upsample_counter  = Signal(range(self.upsample_factor))
         input_data        = Signal.like(self.signal_in.payload)
         input_ready       = Signal()
         input_valid       = Signal()
@@ -65,7 +65,7 @@ class FractionalResampler(Elaboratable):
             m.d.sync += upsample_counter.eq(upsample_counter - 1)
 
         # downsampling and output
-        downsample_counter = Signal(self.downsample_factor)
+        downsample_counter = Signal(range(self.downsample_factor))
 
         m.d.comb += [
             downsamplefifo.w_data.eq(antialiasingfilter.signal_out),

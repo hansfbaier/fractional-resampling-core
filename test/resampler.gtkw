@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.109 (w)1999-2020 BSI
-[*] Mon Jun 28 04:39:42 2021
+[*] Mon Jun 28 06:02:24 2021
 [*]
 [dumpfile] "resampler.vcd"
-[dumpfile_mtime] "Mon Jun 28 04:39:12 2021"
-[dumpfile_size] 260805
+[dumpfile_mtime] "Mon Jun 28 06:01:28 2021"
+[dumpfile_size] 379711
 [savefile] "test/resampler.gtkw"
 [timestart] 0
 [size] 3828 2090
@@ -12,7 +12,7 @@
 *-19.574320 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [sst_width] 481
-[signals_width] 345
+[signals_width] 375
 [sst_expanded] 1
 [sst_vpaned_height] 658
 @28
@@ -23,18 +23,16 @@ top.input_data[15:0]
 top.input_valid
 top.input_ready
 @24
-top.upsample_counter[5:0]
+top.upsample_counter[2:0]
 @200
--AntialiasingFilter
+-Filterbank
 @28
 top.enable_in
 @8420
 top.antialiasingfilter.signal_in[15:0]
 @20000
 -
-@20001
 -
-@20000
 -
 @18420
 top.antialiasingfilter.signal_out[15:0]
@@ -42,5 +40,15 @@ top.antialiasingfilter.signal_out[15:0]
 -
 -
 -
+@25
+top.downsample_counter[2:0]
+@8420
+top.payload$1[15:0]
+@20000
+-
+-
+-
+@28
+top.valid$1
 [pattern_trace] 1
 [pattern_trace] 0
