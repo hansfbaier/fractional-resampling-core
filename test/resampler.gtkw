@@ -14,7 +14,7 @@
 [sst_width] 481
 [signals_width] 375
 [sst_expanded] 1
-[sst_vpaned_height] 658
+[sst_vpaned_height] 650
 @28
 top.clk
 @420
@@ -40,7 +40,7 @@ top.antialiasingfilter.signal_out[15:0]
 -
 -
 -
-@25
+@24
 top.downsample_counter[2:0]
 @8420
 top.payload$1[15:0]
@@ -50,5 +50,9 @@ top.payload$1[15:0]
 -
 @28
 top.valid$1
+@29
+top.ready$1
+@28
+top.ready
 [pattern_trace] 1
 [pattern_trace] 0

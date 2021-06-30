@@ -69,7 +69,7 @@ class FractionalResampler(Elaboratable):
 
         m.d.comb += [
             downsamplefifo.w_data.eq(antialiasingfilter.signal_out),
-            self.signal_out.valid.eq(downsamplefifo.r_rdy & downsamplefifo.r_en),
+            self.signal_out.valid.eq(downsamplefifo.r_rdy),
         ]
 
         with m.If(downsamplefifo.r_rdy & self.signal_out.ready):

@@ -24,6 +24,8 @@ if __name__ == "__main__":
                     yield dut.signal_in.payload.eq(2**14)
                 else:
                     yield dut.signal_in.valid.eq(0)
+            elif i == 500:
+                yield dut.signal_out.ready.eq(0)
             else:
                 if i % 6 == 0:
                     yield dut.signal_in.valid.eq(1)
