@@ -10,7 +10,7 @@ class Filterbank(Elaboratable):
     def __init__(self, num_instances,
                  samplerate: int, bitwidth: int=18, fraction_width: int=18,
                  cutoff_freq: int=20000, filter_order: int=2,
-                 filter_type: str='lowpass') -> None:
+                 filter_type: str='lowpass', verbose=True) -> None:
         self.enable_in  = Signal()
         self.signal_in  = Signal(signed(bitwidth))
         self.signal_out = Signal(signed(bitwidth))
@@ -18,7 +18,7 @@ class Filterbank(Elaboratable):
         self.filters = [FixedPointIIRFilter(samplerate=samplerate,
                                             bitwidth=bitwidth, fraction_width=fraction_width,
                                             cutoff_freq=cutoff_freq, filter_order=filter_order,
-                                            filter_type=filter_type)
+                                            filter_type=filter_type, verbose=verbose)
                         for _ in range(num_instances)]
 
     def elaborate(self, platform) -> Module:

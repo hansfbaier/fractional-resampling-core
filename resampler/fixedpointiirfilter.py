@@ -3,13 +3,15 @@
 # Copyright (c) 2021 Hans Baier <hansfbaier@gmail.com>
 # SPDX-License-Identifier: CERN-OHL-W-2.0
 
+from math import ceil
 from scipy import signal
 from nmigen import *
 from pprint import pformat
 
 class FixedPointIIRFilter(Elaboratable):
     def __init__(self, samplerate: int, bitwidth: int=18, fraction_width: int=18,
-                 cutoff_freq: int=20000, filter_order: int=2, filter_type: str='lowpass') -> None:
+                 cutoff_freq: int=20000, filter_order: int=2, filter_type: str='lowpass',
+                 verbose=True) -> None:
         self.enable_in  = Signal()
         self.signal_in  = Signal(signed(bitwidth))
         self.signal_out = Signal(signed(bitwidth))
@@ -22,16 +24,17 @@ class FixedPointIIRFilter(Elaboratable):
         # convert to fixed point representation
         self.bitwidth = bitwidth
         self.fraction_width = fraction_width
-        assert bitwidth <= fraction_width, f"Bitwidth must not exceed {fraction_width}"
+        assert bitwidth <= fraction_width, f"Bitwidth {bitwidth} must not exceed {fraction_width}"
         self.b = b_fp = [int(x * 2**fraction_width) for x in b]
         self.a = a_fp = [int(x * 2**fraction_width) for x in a]
 
-        print(f"{filter_order}-order Chebyshev-Filter cutoff: {cutoff * nyquist_frequency}" + \
-               " max ripple: {allowed_ripple}dB\n")
-        print(f"b: {pformat(b)}")
-        print(f"a: {pformat(a)}")
-        print(f"b ({bitwidth}.{fraction_width} fixed point): {b_fp}")
-        print(f"a ({bitwidth}.{fraction_width} fixed point): {a_fp}\n")
+        if verbose:
+            print(f"{filter_order}-order Chebyshev-Filter cutoff: {cutoff * nyquist_frequency}" + \
+                " max ripple: {allowed_ripple}dB\n")
+            print(f"b: {pformat(b)}")
+            print(f"a: {pformat(a)}")
+            print(f"b ({bitwidth}.{fraction_width} fixed point): {b_fp}")
+            print(f"a ({bitwidth}.{fraction_width} fixed point): {a_fp}\n")
         assert len(b_fp) == len(a_fp)
 
         def conversion_error(coeff, fp_coeff):
@@ -44,8 +47,9 @@ class FixedPointIIRFilter(Elaboratable):
         num_coefficients = len(b)
         conversion_errors_b = [abs(conversion_error(b[i], b_fp[i])) for i in range(num_coefficients)]
         conversion_errors_a = [abs(conversion_error(a[i], a_fp[i])) for i in range(num_coefficients)]
-        print("b, fixed point conversion errors: {}".format(conversion_errors_a))
-        print("a, fixed point conversion errors: {}".format(conversion_errors_b))
+        if verbose:
+            print("b, fixed point conversion errors: {}".format(conversion_errors_a))
+            print("a, fixed point conversion errors: {}".format(conversion_errors_b))
         for i in range(num_coefficients):
             assert (conversion_errors_b[i] < 1.0)
             assert (conversion_errors_a[i] < 1.0)

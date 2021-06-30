@@ -13,7 +13,8 @@ class FractionalResampler(Elaboratable):
                  upsample_factor: int, downsample_factor: int,
                  filter_instances = 3,
                  filter_cutoff: int = 20000,
-                 bitwidth: int = 16) -> None:
+                 bitwidth: int = 16,
+                 verbose=True) -> None:
         self.signal_in  = StreamInterface(payload_width=bitwidth)
         self.signal_out = StreamInterface(payload_width=bitwidth)
 
@@ -23,6 +24,7 @@ class FractionalResampler(Elaboratable):
         self.filter_instances = filter_instances
         self.filter_cutoff = filter_cutoff
         self.bitwidth = bitwidth
+        self.verbose = verbose
 
     def elaborate(self, platform) -> Module:
         m = Module()
@@ -32,7 +34,8 @@ class FractionalResampler(Elaboratable):
                        self.input_samplerate * self.upsample_factor,
                        bitwidth=self.bitwidth,
                        cutoff_freq=self.filter_cutoff,
-                       filter_order=2)
+                       filter_order=2,
+                       verbose=self.verbose)
 
         m.submodules.downsamplefifo = downsamplefifo = \
             SyncFIFO(width=self.bitwidth, depth=self.upsample_factor)
