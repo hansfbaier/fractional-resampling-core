@@ -10,10 +10,12 @@ from nmigen.sim import Simulator, Tick
 from resampler.resampler import FractionalResampler
 
 if __name__ == "__main__":
-    dut = FractionalResampler(input_samplerate=56000, upsample_factor=6, downsample_factor=7, filter_cutoff=20000)
+    dut = FractionalResampler(input_samplerate=56000, upsample_factor=6, downsample_factor=7, filter_cutoff=20000, prescale=4)
     sim = Simulator(dut)
 
     def sync_process():
+        max = int(2**15 - 1)
+        min = -max
         for _ in range(10): yield Tick()
         yield dut.signal_out.ready.eq(1)
         for i in range(600):
@@ -21,7 +23,7 @@ if __name__ == "__main__":
             if i < 250:
                 if i % 6 == 0:
                     yield dut.signal_in.valid.eq(1)
-                    yield dut.signal_in.payload.eq(2**14)
+                    yield dut.signal_in.payload.eq(max)
                 else:
                     yield dut.signal_in.valid.eq(0)
             elif i == 500:
@@ -29,7 +31,7 @@ if __name__ == "__main__":
             else:
                 if i % 6 == 0:
                     yield dut.signal_in.valid.eq(1)
-                    yield dut.signal_in.payload.eq(-2**14)
+                    yield dut.signal_in.payload.eq(min)
                 else:
                     yield dut.signal_in.valid.eq(0)
 

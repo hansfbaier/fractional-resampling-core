@@ -3,6 +3,7 @@
 # Copyright (c) 2021 Hans Baier <hansfbaier@gmail.com>
 # SPDX-License-Identifier: CERN-OHL-W-2.0
 
+import math
 from nmigen import *
 from nmigen.lib.fifo import SyncFIFO
 from nmigen_library.stream import StreamInterface
@@ -14,6 +15,7 @@ class FractionalResampler(Elaboratable):
                  filter_instances = 3,
                  filter_cutoff: int = 20000,
                  bitwidth: int = 16,
+                 prescale=None,
                  verbose=True) -> None:
         self.signal_in  = StreamInterface(payload_width=bitwidth)
         self.signal_out = StreamInterface(payload_width=bitwidth)
@@ -25,14 +27,20 @@ class FractionalResampler(Elaboratable):
         self.filter_cutoff = filter_cutoff
         self.bitwidth = bitwidth
         self.verbose = verbose
+        self.prescale = prescale
 
     def elaborate(self, platform) -> Module:
         m = Module()
 
+        # FPGA multipliers are multiples of 9 bit wide
+        # so add 1 bit of headroom for every 8 bits
+        headroom_bitwidth = int(math.ceil(self.bitwidth/8) * 9)
+        prescale = (self.upsample_factor - 1) if self.prescale is None else self.prescale
+
         m.submodules.antialiasingfilter = antialiasingfilter = \
             Filterbank(self.filter_instances,
                        self.input_samplerate * self.upsample_factor,
-                       bitwidth=self.bitwidth,
+                       bitwidth=headroom_bitwidth,
                        cutoff_freq=self.filter_cutoff,
                        filter_order=2,
                        verbose=self.verbose)
@@ -41,9 +49,9 @@ class FractionalResampler(Elaboratable):
             SyncFIFO(width=self.bitwidth, depth=self.upsample_factor)
 
         # upsampling
-        upsampled_signal  = Signal.like(self.signal_in.payload)
+        upsampled_signal  = Signal(signed(headroom_bitwidth))
         upsample_counter  = Signal(range(self.upsample_factor))
-        input_data        = Signal.like(self.signal_in.payload)
+        input_data        = Signal(signed(self.bitwidth))
         input_ready       = Signal()
         input_valid       = Signal()
 
@@ -51,7 +59,7 @@ class FractionalResampler(Elaboratable):
             self.signal_in.ready.eq(input_ready),
             input_valid.eq(self.signal_in.valid),
             input_ready.eq((upsample_counter == 0) & (downsamplefifo.w_rdy)),
-            input_data.eq(self.signal_in.payload),
+            input_data.eq(self.signal_in.payload.as_signed()),
             antialiasingfilter.signal_in.eq(upsampled_signal),
             antialiasingfilter.enable_in.eq(upsample_counter > 0),
             downsamplefifo.w_en.eq(downsamplefifo.w_rdy & antialiasingfilter.enable_in),
@@ -59,7 +67,7 @@ class FractionalResampler(Elaboratable):
 
         with m.If(input_valid & input_ready):
             m.d.comb += [
-                upsampled_signal.eq(self.signal_in.payload),
+                upsampled_signal.eq(input_data * Const(prescale)),
                 antialiasingfilter.enable_in.eq(1),
             ]
             m.d.sync += upsample_counter.eq(self.upsample_factor - 1)
