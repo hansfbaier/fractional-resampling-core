@@ -5,3 +5,6 @@ Resampling is achieved by:
 1. Upsampling the signal by the multiplier
 2. Anti-aliasing filtering (6-th order Chebyshev). IIR filter for minimal latency.
 3. Downsampling the signal by the divider
+
+# status
+The code has been tested working on the FPGA
