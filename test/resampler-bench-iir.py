@@ -10,7 +10,8 @@ from nmigen.sim import Simulator, Tick
 from resampler.resampler import FractionalResampler
 
 if __name__ == "__main__":
-    dut = FractionalResampler(input_samplerate=56000, upsample_factor=6, downsample_factor=7, filter_cutoff=20000, prescale=4)
+    dut = FractionalResampler(filter_structure='iir', input_samplerate=56000, \
+        upsample_factor=6, downsample_factor=7, filter_cutoff=20000, prescale=4)
     sim = Simulator(dut)
 
     def sync_process():
@@ -37,5 +38,7 @@ if __name__ == "__main__":
 
     sim.add_sync_process(sync_process)
     sim.add_clock(10e-9)
-    with sim.write_vcd('resampler.vcd', traces=[dut.signal_in.payload, dut.signal_in.valid, dut.signal_out.valid, dut.signal_out.payload]):
+    with sim.write_vcd('resampler-bench-iir.vcd', traces=[
+        dut.signal_in.payload, dut.signal_in.valid,
+        dut.signal_out.valid,  dut.signal_out.payload]):
         sim.run()
