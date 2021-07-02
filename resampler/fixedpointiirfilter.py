@@ -30,7 +30,7 @@ class FixedPointIIRFilter(Elaboratable):
 
         if verbose:
             print(f"{filter_order}-order Chebyshev-Filter cutoff: {cutoff * nyquist_frequency}" + \
-                " max ripple: {allowed_ripple}dB\n")
+                f" max ripple: {allowed_ripple}dB\n")
             print(f"b: {pformat(b)}")
             print(f"a: {pformat(a)}")
             print(f"b ({bitwidth}.{fraction_width} fixed point): {b_fp}")
