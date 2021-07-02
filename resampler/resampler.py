@@ -10,15 +10,17 @@ from nmigen_library.stream import StreamInterface
 from .filterbank import Filterbank
 
 class FractionalResampler(Elaboratable):
-    def __init__(self, *, input_samplerate: int,
-                 upsample_factor: int, downsample_factor: int,
-                 filter_structure='fir', # or 'iir'
-                 filter_instances = 1,
-                 filter_order = 24,
-                 filter_cutoff: int = 20000,
-                 bitwidth: int = 16,
-                 prescale=None,
-                 verbose=True) -> None:
+    def __init__(self, *,
+                 input_samplerate:  int,
+                 upsample_factor:   int,
+                 downsample_factor: int,
+                 filter_structure:  str  ='fir', # or 'iir'
+                 filter_instances:  int  = 1,
+                 filter_order:      int  = 24,
+                 filter_cutoff:     int  = 20000,
+                 bitwidth:          int  = 16,
+                 prescale:          int  = None,
+                 verbose:           bool = True) -> None:
         self.signal_in  = StreamInterface(payload_width=bitwidth)
         self.signal_out = StreamInterface(payload_width=bitwidth)
 

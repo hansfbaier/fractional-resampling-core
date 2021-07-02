@@ -9,9 +9,15 @@ from nmigen import *
 from pprint import pformat
 
 class FixedPointIIRFilter(Elaboratable):
-    def __init__(self, samplerate: int, bitwidth: int=18, fraction_width: int=18,
-                 cutoff_freq: int=20000, filter_order: int=2, filter_type: str='lowpass',
-                 verbose=True) -> None:
+    def __init__(self,
+                 samplerate:     int,
+                 bitwidth:       int=18,
+                 fraction_width: int=18,
+                 cutoff_freq:    int=20000,
+                 filter_order:   int=2,
+                 filter_type:    str='lowpass',
+                 verbose:        bool=False) -> None:
+
         self.enable_in  = Signal()
         self.signal_in  = Signal(signed(bitwidth))
         self.signal_out = Signal(signed(bitwidth))

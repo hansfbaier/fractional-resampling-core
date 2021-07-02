@@ -9,9 +9,15 @@ from nmigen import *
 from pprint import pformat
 
 class FixedPointFIRFilter(Elaboratable):
-    def __init__(self, samplerate: int, bitwidth: int=18, fraction_width: int=18,
-                 cutoff_freq: int=20000, filter_order: int=24, filter_type: str='lowpass',
-                 verbose=True) -> None:
+    def __init__(self,
+                 samplerate:     int,
+                 bitwidth:       int=18,
+                 fraction_width: int=18,
+                 cutoff_freq:    int=20000,
+                 filter_order:   int=24,
+                 filter_type:    str='lowpass',
+                 verbose:        bool=True) -> None:
+
         self.enable_in  = Signal()
         self.signal_in  = Signal(signed(bitwidth))
         self.signal_out = Signal(signed(bitwidth))
@@ -52,7 +58,8 @@ class FixedPointFIRFilter(Elaboratable):
         taps = [Const(n, signed(width)) for n in self.taps]
 
         # we use the array indices flipped, ascending from zero
-        # so x[0] is x_n, x[1] is x_n-1, x[2] is x_n-2 ...
+        # so x[0] is x_n, x[1] is x_n-
+        # 1, x[2] is x_n-2 ...
         # in other words: higher indices are past values, 0 is most recent
         x = Array(Signal(signed(width), name=f"x{i}") for i in range(n))
 
